@@ -81,10 +81,27 @@ fn camera_controller(
     }
 }
 
+fn camera(mut commands: Commands, mut windows: ResMut<Windows>) {
+    let window = windows.get_primary_mut().unwrap();
+    window.set_cursor_visibility(false);
+    window.set_cursor_lock_mode(true);
+
+    let mut state = CameraState::default();
+    state.yaw = 45.0;
+    state.pitch = 15.0;
+
+    commands.spawn_bundle(PerspectiveCameraBundle {
+        transform: Transform::from_translation(Vec3::new(4.0, 2.0, 4.0))
+            .looking_at(Vec3::new(0.0, 0.5, 0.0), Vec3::Y),
+        ..Default::default()
+    }).insert(state);
+}
+
 pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
 	fn build(&self, app: &mut AppBuilder) {
+        app.add_system(camera.system());
 		app.add_system(camera_controller.system());
 	}
 }

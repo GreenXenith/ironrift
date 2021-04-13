@@ -3,7 +3,7 @@ use bevy::app::Events;
 use bevy::input::keyboard::KeyCode;
 
 mod camera;
-use camera::{CameraState, CameraPlugin};
+use camera::CameraPlugin;
 
 fn main() {
     App::build()
@@ -29,16 +29,7 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut windows: ResMut<Windows>,
 ) {
-    let window = windows.get_primary_mut().unwrap();
-    window.set_cursor_visibility(false);
-    window.set_cursor_lock_mode(true);
-
-    let mut state = CameraState::default();
-    state.yaw = 45.0;
-    state.pitch = 15.0;
-
     // Cube
     commands.spawn_bundle(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
@@ -52,11 +43,4 @@ fn setup(
         transform: Transform::from_translation(Vec3::new(4.0, 8.0, 12.0)),
         ..Default::default()
     });
-
-    // Camera
-    commands.spawn_bundle(PerspectiveCameraBundle {
-        transform: Transform::from_translation(Vec3::new(4.0, 2.0, 4.0))
-            .looking_at(Vec3::new(0.0, 0.5, 0.0), Vec3::Y),
-        ..Default::default()
-    }).insert(state);
 }
