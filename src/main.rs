@@ -1,15 +1,14 @@
-use bevy::{
-    input::keyboard::KeyCode,
-    prelude::*,
-};
+use bevy::prelude::*;
+use bevy::app::Events;
+use bevy::input::keyboard::KeyCode;
 
 mod camera;
 use camera::{CameraState, CameraPlugin};
 
 fn main() {
     App::build()
-        .add_resource(Msaa { samples: 4 })
-        .add_resource(WindowDescriptor {
+        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(WindowDescriptor {
             title: "Ironrift".to_string(),
             ..Default::default()
         })
@@ -27,7 +26,7 @@ fn quit (keys: Res<Input<KeyCode>>, mut exit: ResMut<Events<bevy::app::AppExit>>
 }
 
 fn setup(
-    commands: &mut Commands,
+    mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut windows: ResMut<Windows>,
@@ -40,24 +39,24 @@ fn setup(
     state.yaw = 45.0;
     state.pitch = 15.0;
 
-    commands
-        // Cube
-        .spawn(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: materials.add(Color::rgb(0.6, 0.9, 0.6).into()),
-            transform: Transform::from_translation(Vec3::new(0.0, 0.5, 0.0)),
-            ..Default::default()
-        })
-        // Light
-        .spawn(LightBundle {
-            transform: Transform::from_translation(Vec3::new(4.0, 8.0, 12.0)),
-            ..Default::default()
-        })
-        // Camera
-        .spawn(Camera3dBundle {
-            transform: Transform::from_translation(Vec3::new(4.0, 2.0, 4.0))
-                .looking_at(Vec3::new(0.0, 0.5, 0.0), Vec3::unit_y()),
-            ..Default::default()
-        })
-        .with(state);
+    // Cube
+    commands.spawn_bundle(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: materials.add(Color::rgb(0.6, 0.9, 0.6).into()),
+        transform: Transform::from_translation(Vec3::new(0.0, 0.5, 0.0)),
+        ..Default::default()
+    });
+
+    // Light
+    commands.spawn_bundle(LightBundle {
+        transform: Transform::from_translation(Vec3::new(4.0, 8.0, 12.0)),
+        ..Default::default()
+    });
+
+    // Camera
+    commands.spawn_bundle(PerspectiveCameraBundle {
+        transform: Transform::from_translation(Vec3::new(4.0, 2.0, 4.0))
+            .looking_at(Vec3::new(0.0, 0.5, 0.0), Vec3::Y),
+        ..Default::default()
+    }).insert(state);
 }

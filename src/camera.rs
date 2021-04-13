@@ -1,9 +1,5 @@
-use bevy::{
-    input::{keyboard::KeyCode, mouse::MouseMotion},
-    math,
-    prelude::*,
-};
-
+use bevy::prelude::*;
+use bevy::input::{keyboard::KeyCode, mouse::MouseMotion};
 pub struct CameraState {
     pub pitch: f32,
     pub yaw: f32,
@@ -17,7 +13,7 @@ impl Default for CameraState {
         Self {
             pitch: 0.0,
             yaw: 0.0,
-            velocity: Vec3::zero(),
+            velocity: Vec3::ZERO,
 			sensitivity: 10.0,
 			speed: 5.0,
         }
@@ -28,15 +24,14 @@ fn camera_controller(
     time: Res<Time>,
     keys: Res<Input<KeyCode>>,
 
-    motion: Res<Events<MouseMotion>>,
-    mut reader: Local<EventReader<MouseMotion>>,
+    mut reader: EventReader<MouseMotion>,
 
     mut query: Query<(&mut CameraState, &mut Transform)>,
 ) {
     let delta_s = time.delta_seconds();
 
-    let mut delta_m: Vec2 = Vec2::zero();
-    for event in reader.iter(&motion) {
+    let mut delta_m: Vec2 = Vec2::ZERO;
+    for event in reader.iter() {
         delta_m += event.delta;
     }
 
@@ -45,15 +40,15 @@ fn camera_controller(
             state.yaw -= delta_m.x * state.sensitivity * delta_s;
             state.pitch += delta_m.y * state.sensitivity * delta_s;
 
-            state.pitch = math::clamp(state.pitch, -89.9, 89.9);
+            state.pitch = state.pitch.clamp(-89.9, 89.9);
 
-            transform.rotation = Quat::from_axis_angle(Vec3::unit_y(), state.yaw.to_radians())
-                        * Quat::from_axis_angle(-Vec3::unit_x(), state.pitch.to_radians());
+            transform.rotation = Quat::from_axis_angle(Vec3::Y, state.yaw.to_radians())
+                        * Quat::from_axis_angle(-Vec3::X, state.pitch.to_radians());
         }
 
-        state.velocity = Vec3::zero();
+        state.velocity = Vec3::ZERO;
 
-        let forward = transform.rotation.mul_vec3(Vec3::unit_z()).normalize() * Vec3::new(1.0, 0.0, 1.0);
+        let forward = transform.rotation.mul_vec3(Vec3::Z).normalize() * Vec3::new(1.0, 0.0, 1.0);
         let strafe = Quat::from_rotation_y(90.0f32.to_radians()).mul_vec3(forward).normalize();
 
         if keys.pressed(KeyCode::W) {
