@@ -3,10 +3,8 @@ use bevy::app::Events;
 use bevy::input::keyboard::KeyCode;
 
 mod camera;
-use camera::CameraPlugin;
-
 mod map;
-use map::MapPlugin;
+mod player;
 
 fn main() {
     App::build()
@@ -17,8 +15,9 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_system(quit.system())
-        .add_plugin(CameraPlugin)
-        .add_plugin(MapPlugin)
+        .add_plugin(camera::CameraPlugin)
+        .add_plugin(map::MapPlugin)
+        .add_plugin(player::PlayerPlugin)
         .run();
 }
 

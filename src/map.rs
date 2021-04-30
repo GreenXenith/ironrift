@@ -63,7 +63,7 @@ fn mesh_collider(mesh: &Mesh) -> ColliderBuilder {
 fn initialize_map(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    map_handles: Res<MapHandles>,
+    // map_handles: Res<MapHandles>,
     assets: Res<AssetServer>,
     meshes: Res<Assets<Mesh>>,
 ) {
@@ -78,7 +78,7 @@ fn initialize_map(
         ..Default::default()
     })
     .insert(RigidBodyBuilder::new_static().translation(0.0, 0.0, 0.0))
-    .insert(mesh_collider(meshes.get("models/maps/testmap.glb#Mesh0/Primitive0").unwrap()));
+    .insert(mesh_collider(meshes.get("models/maps/testmap.glb#Mesh0/Primitive0").unwrap()).user_data(1));
 
     // Light
     commands.spawn().insert_bundle(LightBundle {
@@ -90,16 +90,6 @@ fn initialize_map(
         transform: Transform::from_translation(Vec3::new(100.0, 100.0, 100.0)),
         ..Default::default()
     });
-
-    // Load objects
-    commands.spawn().insert_bundle(PbrBundle {
-        mesh: assets.get_handle("models/maps/monke.glb#Mesh0/Primitive0"),
-        material: materials.add(Color::WHITE.into()),
-        // transform: Transform::from_translation(Vec3::new(0.0, 3.0, 0.0)),
-        ..Default::default()
-    })
-    .insert(RigidBodyBuilder::new_dynamic().translation(0.0, 3.0, 0.0))
-    .insert(ColliderBuilder::ball(1.0));
 }
 
 pub struct MapPlugin;
