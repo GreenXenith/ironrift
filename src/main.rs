@@ -15,9 +15,9 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_system(quit.system())
-        .add_plugin(camera::CameraPlugin)
         .add_plugin(map::MapPlugin)
         .add_plugin(player::PlayerPlugin)
+        .add_plugin(camera::CameraPlugin)
         .run();
 }
 

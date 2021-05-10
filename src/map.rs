@@ -95,7 +95,7 @@ fn initialize_map(
 pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
-	fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<MapHandles>();
         app.add_state(AppState::Loading);
         app.add_system_set(SystemSet::on_enter(AppState::Loading).with_system(load_maps.system()));
@@ -103,5 +103,5 @@ impl Plugin for MapPlugin {
         app.add_system_set(SystemSet::on_enter(AppState::Loaded).with_system(initialize_map.system()));
         app.add_plugin(RapierPhysicsPlugin);
         // app.add_plugin(RapierRenderPlugin);
-	}
+    }
 }
