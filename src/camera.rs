@@ -55,7 +55,7 @@ fn camera(mut commands: Commands, mut windows: ResMut<Windows>) {
     state.yaw = 45.0;
     state.pitch = 15.0;
 
-    commands.spawn_bundle(PerspectiveCameraBundle {
+    commands.spawn().insert_bundle(PerspectiveCameraBundle {
         transform: Transform::from_translation(Vec3::new(4.0, 2.0, 4.0))
             .looking_at(Vec3::new(0.0, 0.5, 0.0), Vec3::Y),
         ..Default::default()

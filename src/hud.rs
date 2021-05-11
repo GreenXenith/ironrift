@@ -121,22 +121,22 @@ fn add_hud(
     mut smaterials: ResMut<Assets<StandardMaterial>>,
     mut cmaterials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn_bundle(HUDCameraBundle::default());
-    // commands.spawn_bundle(PerspectiveCameraBundle::with_name(node::HUD_CAMERA));
+    commands.spawn().insert_bundle(HUDCameraBundle::default());
+    // commands.spawn().insert_bundle(PerspectiveCameraBundle::with_name(node::HUD_CAMERA));
 
     let mut transform = Transform::from_translation(Vec3::new(2.0, -1.0, -5.0));
     transform.rotate(Quat::from_axis_angle(Vec3::new(0.0, 1.0, 0.0), 180f32.to_radians()));
 
-    commands.spawn_bundle(PbrBundle {
+    commands.spawn().insert_bundle(PbrBundle {
         mesh: assets.get_handle(format!("models/maps/monke.glb#Mesh0/Primitive0").as_str()),
         material: smaterials.add(Color::rgb(0.6, 0.9, 0.6).into()),
         transform: transform,
         ..Default::default()
     }).remove::<base::MainPass>().insert(HUDPass);
 
-    commands.spawn_bundle(UiCameraBundle::default());
+    commands.spawn().insert_bundle(UiCameraBundle::default());
 
-    commands.spawn_bundle(TextBundle {
+    commands.spawn().insert_bundle(TextBundle {
         text: Text::with_section(
             "Text",
             TextStyle {
@@ -154,7 +154,7 @@ fn add_hud(
 
     let crosshair = textures.get("crosshair.png").unwrap();
 
-    commands.spawn_bundle(NodeBundle {
+    commands.spawn().insert_bundle(NodeBundle {
         style: Style {
             size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
             position_type: PositionType::Absolute,
@@ -165,7 +165,7 @@ fn add_hud(
         material: cmaterials.add(Color::NONE.into()),
         ..Default::default()
     }).with_children(|parent| {
-        parent.spawn_bundle(ImageBundle {
+        parent.spawn().insert_bundle(ImageBundle {
             style: Style {
                 size: Size::new(Val::Px(crosshair.size.width as f32), Val::Px(crosshair.size.height as f32)),
                 align_self: ui::AlignSelf::Center,
