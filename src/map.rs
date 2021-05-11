@@ -1,34 +1,8 @@
 use bevy::prelude::*;
-use bevy::asset::LoadState;
 use bevy_rapier3d::physics::RapierPhysicsPlugin;
 use bevy_rapier3d::rapier::dynamics::RigidBodyBuilder;
 use bevy_rapier3d::rapier::geometry::ColliderBuilder;
 // use bevy_rapier3d::render::RapierRenderPlugin;
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-enum AppState {
-    Loading,
-    Loaded,
-}
-
-#[derive(Default)]
-struct MapHandles {
-    handles: Vec<HandleUntyped>,
-}
-
-fn load_maps(mut map_handles: ResMut<MapHandles>, assets: Res<AssetServer>) {
-    map_handles.handles = assets.load_folder("models/maps").unwrap();
-}
-
-fn check_maps(
-    mut state: ResMut<State<AppState>>,
-    map_handles: ResMut<MapHandles>,
-    assets: Res<AssetServer>,
-) {
-    if let LoadState::Loaded = assets.get_group_load_state(map_handles.handles.iter().map(|handle| handle.id)) {
-        state.set(AppState::Loaded).unwrap();
-    }
-}
 
 fn mesh_collider(mesh: &Mesh) -> ColliderBuilder {
     use bevy_rapier3d::na::Point3;
@@ -63,7 +37,7 @@ fn mesh_collider(mesh: &Mesh) -> ColliderBuilder {
 fn initialize_map(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    // map_handles: Res<MapHandles>,
+
     assets: Res<AssetServer>,
     meshes: Res<Assets<Mesh>>,
 ) {
@@ -96,11 +70,7 @@ pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.init_resource::<MapHandles>();
-        app.add_state(AppState::Loading);
-        app.add_system_set(SystemSet::on_enter(AppState::Loading).with_system(load_maps.system()));
-        app.add_system_set(SystemSet::on_update(AppState::Loading).with_system(check_maps.system()));
-        app.add_system_set(SystemSet::on_enter(AppState::Loaded).with_system(initialize_map.system()));
+        app.add_system_set(SystemSet::on_enter(crate::AppState::Loaded).with_system(initialize_map.system()));
         app.add_plugin(RapierPhysicsPlugin);
         // app.add_plugin(RapierRenderPlugin);
     }

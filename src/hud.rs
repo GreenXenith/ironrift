@@ -154,6 +154,6 @@ pub struct HudPlugin;
 impl Plugin for HudPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_startup_system(init_hud.system());
-        app.add_startup_system(add_hud.system());
+        app.add_system_set(SystemSet::on_enter(crate::AppState::Loaded).with_system(add_hud.system()));
     }
 }
