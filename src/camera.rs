@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 use bevy::input::mouse::MouseMotion;
 
-use crate::player::Player;
-
 pub struct CameraState {
     pub pitch: f32,
     pub yaw: f32,
@@ -23,7 +21,7 @@ fn camera_controller(
     mut reader: EventReader<MouseMotion>,
 
     mut camera_query: Query<(&mut CameraState, &mut Transform), With<CameraState>>,
-    player_query: Query<(&Player, &Transform), Without<CameraState>>,
+    player_query: Query<(&crate::player::Player, &Transform), Without<CameraState>>,
 ) {
     let delta_s = time.delta_seconds();
 
@@ -61,7 +59,8 @@ fn camera(mut commands: Commands, mut windows: ResMut<Windows>) {
         transform: Transform::from_translation(Vec3::new(4.0, 2.0, 4.0))
             .looking_at(Vec3::new(0.0, 0.5, 0.0), Vec3::Y),
         ..Default::default()
-    }).insert(state);
+    })
+    .insert(state);
 }
 
 pub struct CameraPlugin;
@@ -70,5 +69,6 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_startup_system(camera.system());
         app.add_system(camera_controller.system());
+        app.add_plugin(crate::hud::HudPlugin);
     }
 }

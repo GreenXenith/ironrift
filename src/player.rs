@@ -125,5 +125,6 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_startup_system(spawn_player.system());
         app.add_system(player_controller.system());
+        app.add_plugin(crate::camera::CameraPlugin);
     }
 }
