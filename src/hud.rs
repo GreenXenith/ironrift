@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy::render::{camera, pass, render_graph, render_graph::base};
+use bevy::ui;
 
 pub mod node {
     pub const HUD_CAMERA: &str = "hud_camera";
@@ -102,7 +103,7 @@ fn init_hud(
 
     // Connect main pass to hud pass to ui pass
     graph.add_node_edge(base::node::MAIN_PASS, node::HUD_PASS).unwrap();
-    graph.add_node_edge(node::HUD_PASS, bevy::ui::node::UI_PASS).unwrap();
+    graph.add_node_edge(node::HUD_PASS, ui::node::UI_PASS).unwrap();
 
     // Add hud resource and connect to hud pass
     graph.add_system_node(node::HUD_NODE, render_graph::RenderResourcesNode::<HUDPass>::new(true));
@@ -116,7 +117,9 @@ fn add_hud(
     mut commands: Commands,
 
     assets: Res<AssetServer>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    textures: Res<Assets<Texture>>,
+    mut smaterials: ResMut<Assets<StandardMaterial>>,
+    mut cmaterials: ResMut<Assets<ColorMaterial>>,
 ) {
     commands.spawn_bundle(HUDCameraBundle::default());
     // commands.spawn_bundle(PerspectiveCameraBundle::with_name(node::HUD_CAMERA));
@@ -126,12 +129,13 @@ fn add_hud(
 
     commands.spawn_bundle(PbrBundle {
         mesh: assets.get_handle(format!("models/maps/monke.glb#Mesh0/Primitive0").as_str()),
-        material: materials.add(Color::rgb(0.6, 0.9, 0.6).into()),
+        material: smaterials.add(Color::rgb(0.6, 0.9, 0.6).into()),
         transform: transform,
         ..Default::default()
     }).remove::<base::MainPass>().insert(HUDPass);
 
     commands.spawn_bundle(UiCameraBundle::default());
+
     commands.spawn_bundle(TextBundle {
         text: Text::with_section(
             "Text",
@@ -147,6 +151,30 @@ fn add_hud(
         ),
         ..Default::default()
     });
+
+    let crosshair = textures.get("crosshair.png").unwrap();
+
+    commands.spawn_bundle(NodeBundle {
+        style: Style {
+            size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+            position_type: PositionType::Absolute,
+            justify_content: ui::JustifyContent::Center,
+            align_items: ui::AlignItems::FlexEnd,
+            ..Default::default()
+        },
+        material: cmaterials.add(Color::NONE.into()),
+        ..Default::default()
+    }).with_children(|parent| {
+        parent.spawn_bundle(ImageBundle {
+            style: Style {
+                size: Size::new(Val::Px(crosshair.size.width as f32), Val::Px(crosshair.size.height as f32)),
+                align_self: ui::AlignSelf::Center,
+                ..Default::default()
+            },
+            material: cmaterials.add(assets.load("crosshair.png").into()),
+            ..Default::default()
+        });
+    });    
 }
 
 pub struct HudPlugin;
