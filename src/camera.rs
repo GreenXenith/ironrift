@@ -16,15 +16,11 @@ impl Default for CameraState {
 }
 
 fn camera_controller(
-    time: Res<Time>,
-
     mut reader: EventReader<MouseMotion>,
 
     mut camera_query: Query<(&mut CameraState, &mut Transform), With<CameraState>>,
     player_query: Query<(&crate::player::Player, &Transform), Without<CameraState>>,
 ) {
-    let delta_s = time.delta_seconds();
-
     let mut delta_m: Vec2 = Vec2::ZERO;
     for event in reader.iter() {
         delta_m += event.delta;
@@ -35,9 +31,7 @@ fn camera_controller(
 
     if !delta_m.is_nan() {
         state.yaw = player.yaw;
-        state.pitch += delta_m.y * player.sensitivity * delta_s;
-
-        state.pitch = state.pitch.clamp(-89.9, 89.9);
+        state.pitch = player.pitch;
 
         transform.rotation = Quat::from_axis_angle(Vec3::Y, state.yaw.to_radians())
                     * Quat::from_axis_angle(-Vec3::X, state.pitch.to_radians());

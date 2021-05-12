@@ -7,6 +7,7 @@ mod map;
 mod player;
 mod camera;
 mod hud;
+mod bullet;
 
 // Asset loader
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
