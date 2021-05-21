@@ -6,7 +6,7 @@ use bevy_rapier3d::rapier::geometry::ColliderBuilder;
 
 fn mesh_collider(mesh: &Mesh) -> ColliderBuilder {
     use bevy_rapier3d::na::Point3;
-    
+
     let mut vertices: Vec<Point3<f32>> = Vec::new();
     let mut indices: Vec<[u32; 3]> = Vec::new();
 
@@ -52,7 +52,7 @@ fn initialize_map(
         ..Default::default()
     })
     .insert(RigidBodyBuilder::new_static().translation(0.0, 0.0, 0.0))
-    .insert(mesh_collider(meshes.get("models/maps/testmap.glb#Mesh0/Primitive0").unwrap()).user_data(1));
+    .insert(mesh_collider(meshes.get("models/maps/testmap.glb#Mesh0/Primitive0").unwrap()).user_data(crate::ObjectType::Terrain as u128));
 
     // Light
     commands.spawn().insert_bundle(LightBundle {

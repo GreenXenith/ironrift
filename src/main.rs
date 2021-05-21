@@ -4,10 +4,18 @@ use bevy::asset::LoadState;
 use bevy::input::keyboard::KeyCode;
 
 mod map;
+mod unit;
+mod bullet;
 mod player;
 mod camera;
 mod hud;
-mod bullet;
+mod npc;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ObjectType {
+    Terrain,
+    Unit,
+}
 
 // Asset loader
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -56,7 +64,9 @@ fn main() {
 
         // Now load the game
         .add_plugin(map::MapPlugin)
+        .add_plugin(unit::UnitPlugin)
         .add_plugin(player::PlayerPlugin)
+        .add_plugin(npc::NpcPlugin)
         .run();
 }
 

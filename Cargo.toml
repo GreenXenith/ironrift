@@ -7,3 +7,4 @@ edition = "2018"
 bevy = "0.5"
 bevy_rapier3d = { version = "*", features = [ "simd-nightly" ] }
 nalgebra = { version = "*", features = [ "convert-glam", "convert-glam-unchecked" ] }
+rand = "0.8.3"

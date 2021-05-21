@@ -124,13 +124,10 @@ fn add_hud(
     commands.spawn().insert_bundle(HUDCameraBundle::default());
     // commands.spawn().insert_bundle(PerspectiveCameraBundle::with_name(node::HUD_CAMERA));
 
-    let mut transform = Transform::from_translation(Vec3::new(2.0, -1.0, -5.0));
-    transform.rotate(Quat::from_axis_angle(Vec3::new(0.0, 1.0, 0.0), 180f32.to_radians()));
-
     commands.spawn().insert_bundle(PbrBundle {
         mesh: assets.get_handle(format!("models/maps/monke.glb#Mesh0/Primitive0").as_str()),
         material: smaterials.add(Color::rgb(0.6, 0.9, 0.6).into()),
-        transform: transform,
+        transform: Transform::from_translation(Vec3::new(2.0, -1.0, -5.0)),
         ..Default::default()
     }).remove::<base::MainPass>().insert(HUDPass);
 
@@ -174,7 +171,7 @@ fn add_hud(
             material: cmaterials.add(assets.load("crosshair.png").into()),
             ..Default::default()
         });
-    });    
+    });
 }
 
 pub struct HudPlugin;

@@ -1918,6 +1918,7 @@ dependencies = [
  "bevy",
  "bevy_rapier3d",
  "nalgebra",
+ "rand",
 ]
 
 [[package]]
