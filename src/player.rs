@@ -73,14 +73,14 @@ fn player_controller(
 }
 
 fn spawn_player(mut commands: Commands) {
-    commands.spawn().insert_bundle(unit::UnitBundle::new(Vec3::new(0.0, 3.0, 0.0))).insert(Player::default());
+    commands.spawn().insert_bundle(unit::UnitBundle::new(Vec3::new(0.0, 3.0, 0.0), crate::battle::TeamId::NONE)).insert(Player::default());
 }
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_startup_system(spawn_player.system());
+        app.add_startup_system(spawn_player.system().label("spawn_player"));
         app.add_system(player_controller.system());
         app.add_plugin(crate::camera::CameraPlugin);
     }

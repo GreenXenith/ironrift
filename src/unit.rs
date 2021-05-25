@@ -15,6 +15,7 @@ pub struct UnitState {
     pub roll: f32,
     pub velocity: na::Vector3<f32>,
     pub shoot: bool,
+    pub team: crate::battle::TeamId,
 }
 
 impl UnitState {
@@ -32,6 +33,7 @@ impl Default for UnitState {
             roll: 0.0,
             velocity: na::Vector3::new(0.0, 0.0, 0.0),
             shoot: false,
+            team: crate::battle::TeamId::NONE,
         }
     }
 }
@@ -46,9 +48,9 @@ pub struct UnitBundle {
 }
 
 impl UnitBundle {
-    pub fn new(position: Vec3) -> UnitBundle {
+    pub fn new(position: Vec3, team: crate::battle::TeamId) -> UnitBundle {
         UnitBundle {
-            state: UnitState::default(),
+            state: UnitState {team: team, ..Default::default()},
             transform: Transform::default(),
             rigidbody: rapier::dynamics::RigidBodyBuilder::new_dynamic().translation(position.x, position.y, position.z).lock_rotations(),
             collider: geometry::ColliderBuilder::capsule_y(0.5, 1.0).user_data(crate::ObjectType::Unit as u128),
@@ -58,7 +60,7 @@ impl UnitBundle {
 
 impl Default for UnitBundle {
     fn default() -> Self {
-        Self::new(Vec3::ZERO)
+        Self::new(Vec3::ZERO, crate::battle::TeamId::NONE)
     }
 }
 

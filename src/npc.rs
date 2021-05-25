@@ -17,16 +17,19 @@ impl Default for NPC {
     }
 }
 
-fn get_closest_unit(transform: &Transform, units: &Vec<(unit::UnitState, Transform)>) -> (Vec3, f32) {
-    let pos = transform.translation;
+fn get_closest_unit(this: (&unit::UnitState, &Transform), units: &Vec<(unit::UnitState, Transform)>) -> (Vec3, f32) {
+    let (this_unit, this_transform) = this;
+    let pos = this_transform.translation;
     let mut min_pos = pos;
     let mut min_distance = 0.0f32;
 
-    for (_, transform2) in units {
-        let dist = pos.distance(transform2.translation);
-        if min_distance == 0.0 || (dist < min_distance && dist != 0.0) {
-            min_pos = transform2.translation;
-            min_distance = dist;
+    for (that_unit, that_transform) in units {
+        if this_unit.team != that_unit.team {
+            let dist = pos.distance(that_transform.translation);
+            if min_distance == 0.0 || (dist < min_distance && dist != 0.0) {
+                min_pos = that_transform.translation;
+                min_distance = dist;
+            }
         }
     }
 
@@ -47,7 +50,7 @@ fn npc_controller(
     for (mut unit, transform, npc) in units.iter_mut() {
         // If unit is NPC, update it
         if let Some(npc) = npc {
-            let (closest, dist) = get_closest_unit(&transform, &ulist);
+            let (closest, dist) = get_closest_unit((&unit, &transform), &ulist);
             // If a unit is in range, point at it
             if dist > 0.0 && dist < 15.0 {
                 unit.yaw = (transform.translation.x - closest.x).atan2(transform.translation.z - closest.z);
@@ -76,27 +79,41 @@ fn npc_controller(
     }
 }
 
+pub struct SpawnQueue {
+    pub waiting: Vec<(Vec3, crate::battle::TeamId)>
+}
+
+fn init_queue(mut commands: Commands) {
+    commands.insert_resource(SpawnQueue {waiting: vec![]});
+} 
+
 fn spawn_npcs(
     mut commands: Commands,
+    
+    mut queue: ResMut<SpawnQueue>,
 
     assets: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn()
-    .insert_bundle(unit::UnitBundle::new(Vec3::new(3.0, 3.0, 0.0)))
-    .insert_bundle(PbrBundle {
-        mesh: assets.get_handle(format!("models/maps/monke.glb#Mesh0/Primitive0").as_str()),
-        material: materials.add(Color::rgb(0.6, 0.9, 0.6).into()),
-        ..Default::default()
-    })
-    .insert(NPC::default());
+    while !queue.waiting.is_empty() {
+        let (position, id) = queue.waiting.pop().unwrap();
+        commands.spawn()
+        .insert_bundle(unit::UnitBundle::new(position, id))
+        .insert_bundle(PbrBundle {
+            mesh: assets.get_handle(format!("models/maps/monke.glb#Mesh0/Primitive0").as_str()),
+            material: materials.add(Color::rgb(0.6, 0.9, 0.6).into()),
+            ..Default::default()
+        })
+        .insert(NPC::default());
+    }
 }
 
 pub struct NpcPlugin;
 
 impl Plugin for NpcPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_startup_system(spawn_npcs.system());
+        app.add_startup_system(init_queue.system().label("npc_queue"));
+        app.add_system(spawn_npcs.system());
         app.add_system(npc_controller.system());
     }
 }

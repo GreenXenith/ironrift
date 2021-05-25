@@ -10,6 +10,7 @@ mod player;
 mod camera;
 mod hud;
 mod npc;
+mod battle;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ObjectType {
@@ -67,6 +68,8 @@ fn main() {
         .add_plugin(unit::UnitPlugin)
         .add_plugin(player::PlayerPlugin)
         .add_plugin(npc::NpcPlugin)
+        .add_plugin(battle::BattlePlugin)
+
         .run();
 }
 
