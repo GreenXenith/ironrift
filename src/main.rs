@@ -16,6 +16,7 @@ mod battle;
 pub enum ObjectType {
     Terrain,
     Unit,
+    Bullet,
 }
 
 // Asset loader

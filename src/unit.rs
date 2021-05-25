@@ -1,6 +1,7 @@
 use std::borrow::BorrowMut;
 
 use bevy::prelude::*;
+use bevy::app::Events;
 use bevy_rapier3d::physics;
 use bevy_rapier3d::rapier;
 use bevy_rapier3d::rapier::na;
@@ -16,6 +17,7 @@ pub struct UnitState {
     pub velocity: na::Vector3<f32>,
     pub shoot: bool,
     pub team: crate::battle::TeamId,
+    pub hp: i32,
 }
 
 impl UnitState {
@@ -34,6 +36,7 @@ impl Default for UnitState {
             velocity: na::Vector3::new(0.0, 0.0, 0.0),
             shoot: false,
             team: crate::battle::TeamId::NONE,
+            hp: 4,
         }
     }
 }
@@ -75,12 +78,14 @@ fn unit_handler(
     assets: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 
-    mut query: Query<(&mut UnitState, &physics::RigidBodyHandleComponent, &physics::ColliderHandleComponent)>,
+    mut exit: ResMut<Events<bevy::app::AppExit>>,
+
+    mut query: Query<(Entity, &mut UnitState, &physics::RigidBodyHandleComponent, &physics::ColliderHandleComponent, Option<&crate::player::Player>)>,
 ) {
     let mut units = std::collections::HashMap::new();
 
     // Loop through all units and apply updates
-    for (mut unit, body_handle, collider_handle) in query.iter_mut() {
+    for (entity, mut unit, body_handle, collider_handle, player) in query.iter_mut() {
         let body = bodies.get_mut(body_handle.handle()).unwrap();
 
         // Update rotation
@@ -108,7 +113,7 @@ fn unit_handler(
         }
 
         // Add available units to unit list
-        units.insert(collider_handle.handle(), unit);
+        units.insert(collider_handle.handle(), (unit, entity, player));
     }
 
     // Check for unit contacts
@@ -118,9 +123,20 @@ fn unit_handler(
             geometry::ContactEvent::Started(handle1, handle2) => {
                 if units.contains_key(&handle1) || units.contains_key(&handle2) {
                     let unit_handle = if units.contains_key(&handle1) { handle1 } else { handle2 };
-                    if colliders.get(if unit_handle == handle1 { handle2 } else { handle1 }).unwrap().user_data == terrain {
-                        let unit = units.get_mut(&unit_handle).unwrap().borrow_mut();
+                    let otype = colliders.get(if unit_handle == handle1 { handle2 } else { handle1 }).unwrap().user_data;
+                    let (unit, entity, player) = units.get_mut(&unit_handle).unwrap().borrow_mut();
+                    if otype == terrain {
                         unit.is_touching_ground = true;
+                    } else if otype == crate::ObjectType::Bullet as u128 {
+                        unit.hp -= 1;
+                        if unit.hp <= 0 {
+                            if player.is_some() {
+                                println!("You died.");
+                                exit.send(bevy::app::AppExit);
+                            } else {
+                                commands.entity(*entity).despawn();
+                            }
+                        }
                     }
                 }
             }
@@ -129,7 +145,7 @@ fn unit_handler(
                 if units.contains_key(&handle1) || units.contains_key(&handle2) {
                     let unit_handle = if units.contains_key(&handle1) { handle1 } else { handle2 };
                     if colliders.get(if unit_handle == handle1 { handle2 } else { handle1 }).unwrap().user_data == terrain {
-                        let unit = units.get_mut(&unit_handle).unwrap().borrow_mut();
+                        let (unit, ..) = units.get_mut(&unit_handle).unwrap().borrow_mut();
                         unit.is_touching_ground = false;
                     }
                 }

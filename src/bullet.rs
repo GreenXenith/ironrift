@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::rapier::na;
+use bevy_rapier3d::rapier::geometry;
+use bevy_rapier3d::physics;
 
 pub struct Bullet {
     pub age: f32,
@@ -18,12 +20,26 @@ impl Default for Bullet {
 fn bullet_handler(
     mut commands: Commands,
     time: Res<Time>,
-    mut bquery: Query<(&mut Bullet, Entity)>,
+
+    nphase: Res<geometry::NarrowPhase>,
+
+    mut bquery: Query<(&mut Bullet, Entity, &physics::ColliderHandleComponent)>,
 ) {
-    for (mut bullet, entity) in bquery.iter_mut() {
+    for (mut bullet, entity, handle) in bquery.iter_mut() {
         bullet.age += time.delta_seconds();
         if bullet.age > bullet.lifetime {
             commands.entity(entity).despawn();
+            return
+        }
+
+        let collision = nphase.contacts_with(handle.handle());
+        if collision.is_some() {
+            for (_, _, pair) in collision.unwrap() {
+                if pair.has_any_active_contact {
+                    commands.entity(entity).despawn();
+                    return
+                }
+            }
         }
     }
 }
@@ -32,6 +48,7 @@ fn bullet_handler(
 pub struct BulletBundle {
     pub bullet: Bullet,
     pub rigidbodybuilder: bevy_rapier3d::rapier::dynamics::RigidBodyBuilder,
+    pub collider: geometry::ColliderBuilder,
 }
 
 impl BulletBundle {
@@ -42,6 +59,7 @@ impl BulletBundle {
                 .position(na::Isometry::from_parts(na::Translation3::from(na::Vector3::from(position)), rotation.into()))
                 .linvel(velocity.x, velocity.y, velocity.z)
                 .gravity_scale(0.0),
+            collider: geometry::ColliderBuilder::ball(0.5).user_data(crate::ObjectType::Bullet as u128),
         }
     }
 }
