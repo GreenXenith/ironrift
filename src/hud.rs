@@ -133,21 +133,21 @@ fn add_hud(
 
     commands.spawn().insert_bundle(UiCameraBundle::default());
 
-    commands.spawn().insert_bundle(TextBundle {
-        text: Text::with_section(
-            "Text",
-            TextStyle {
-                font: assets.load("JosefinSans-Regular.ttf"),
-                font_size: 90.0,
-                color: Color::WHITE,
-            },
-            TextAlignment {
-                vertical: VerticalAlign::Top,
-                horizontal: HorizontalAlign::Left,
-            },
-        ),
-        ..Default::default()
-    });
+    // commands.spawn().insert_bundle(TextBundle {
+    //     text: Text::with_section(
+    //         "Text",
+    //         TextStyle {
+    //             font: assets.load("JosefinSans-Regular.ttf"),
+    //             font_size: 90.0,
+    //             color: Color::WHITE,
+    //         },
+    //         TextAlignment {
+    //             vertical: VerticalAlign::Top,
+    //             horizontal: HorizontalAlign::Left,
+    //         },
+    //     ),
+    //     ..Default::default()
+    // });
 
     let crosshair = textures.get("crosshair.png").unwrap();
 
