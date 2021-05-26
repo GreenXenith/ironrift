@@ -125,9 +125,15 @@ fn add_hud(
     // commands.spawn().insert_bundle(PerspectiveCameraBundle::with_name(node::HUD_CAMERA));
 
     commands.spawn().insert_bundle(PbrBundle {
-        mesh: assets.get_handle(format!("models/maps/monke.glb#Mesh0/Primitive0").as_str()),
-        material: smaterials.add(Color::rgb(0.6, 0.9, 0.6).into()),
-        transform: Transform::from_translation(Vec3::new(2.0, -1.0, -5.0)),
+        mesh: assets.get_handle(format!("models/gun.glb#Mesh0/Primitive0").as_str()),
+        material: smaterials.add(StandardMaterial {
+            metallic: 0.0,
+            reflectance: 0.0,
+            roughness: 1.0,
+            base_color_texture: Some(assets.get_handle("gun.png")),
+            ..Default::default()
+        }),
+        transform: Transform::from_translation(Vec3::new(2.0, -1.0, -3.0)),
         ..Default::default()
     }).remove::<base::MainPass>().insert(HUDPass);
 
