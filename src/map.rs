@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use bevy_rapier3d::physics::RapierPhysicsPlugin;
 use bevy_rapier3d::rapier::dynamics::RigidBodyBuilder;
 use bevy_rapier3d::rapier::geometry::ColliderBuilder;
-// use bevy_rapier3d::render::RapierRenderPlugin;
 
 fn mesh_collider(mesh: &Mesh) -> ColliderBuilder {
     use bevy_rapier3d::na::Point3;
@@ -42,17 +41,24 @@ fn initialize_map(
     meshes: Res<Assets<Mesh>>,
 ) {
     // Load map
-    let choice = 1;
-    let maps: [&str; 2] = ["monke", "testmap"];
+    let choice = 2;
+    let maps: [&str; 3] = ["monke", "testmap", "map"];
+    let texture = StandardMaterial {
+        metallic: 0.0,
+        reflectance: 0.0,
+        roughness: 1.0,
+        base_color_texture: Some(assets.get_handle(format!("{}.png", maps[choice]).as_str())),
+        ..Default::default()
+    };
 
     commands.spawn().insert_bundle(PbrBundle {
         mesh: assets.get_handle(format!("models/maps/{}.glb#Mesh0/Primitive0", maps[choice]).as_str()),
-        material: materials.add(Color::rgb(0.6, 0.9, 0.6).into()),
+        material: materials.add(texture),
         transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
         ..Default::default()
     })
     .insert(RigidBodyBuilder::new_static().translation(0.0, 0.0, 0.0))
-    .insert(mesh_collider(meshes.get("models/maps/testmap.glb#Mesh0/Primitive0").unwrap()).user_data(crate::ObjectType::Terrain as u128));
+    .insert(mesh_collider(meshes.get(format!("models/maps/{}_collider.glb#Mesh0/Primitive0", maps[choice]).as_str()).unwrap()).user_data(crate::ObjectType::Terrain as u128));
 
     // Light
     commands.spawn().insert_bundle(LightBundle {
@@ -72,6 +78,6 @@ impl Plugin for MapPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_system_set(SystemSet::on_enter(crate::AppState::Loaded).with_system(initialize_map.system()));
         app.add_plugin(RapierPhysicsPlugin);
-        // app.add_plugin(RapierRenderPlugin);
+        // app.add_plugin(bevy_rapier3d::render::RapierRenderPlugin);
     }
 }

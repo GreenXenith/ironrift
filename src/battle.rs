@@ -36,8 +36,8 @@ fn new_battle(
 ) {
     commands.spawn().insert(Battle {
         teams: vec![
-            Team {id: TeamId::ONE, spawn_point: Vec3::new(50.0, 1.0, 0.0)},
-            Team {id: TeamId::TWO, spawn_point: Vec3::new(-50.0, 1.0, 0.0)},
+            Team {id: TeamId::ONE, spawn_point: Vec3::new(30.0, 3.0, -40.0)},
+            Team {id: TeamId::TWO, spawn_point: Vec3::new(-30.0, 3.0, 30.0)},
         ],
         units_per_team: 20,
         ..Default::default()
