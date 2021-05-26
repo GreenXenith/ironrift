@@ -123,18 +123,21 @@ fn unit_handler(
             geometry::ContactEvent::Started(handle1, handle2) => {
                 if units.contains_key(&handle1) || units.contains_key(&handle2) {
                     let unit_handle = if units.contains_key(&handle1) { handle1 } else { handle2 };
-                    let otype = colliders.get(if unit_handle == handle1 { handle2 } else { handle1 }).unwrap().user_data;
-                    let (unit, entity, player) = units.get_mut(&unit_handle).unwrap().borrow_mut();
-                    if otype == terrain {
-                        unit.is_touching_ground = true;
-                    } else if otype == crate::ObjectType::Bullet as u128 {
-                        unit.hp -= 1;
-                        if unit.hp <= 0 {
-                            if player.is_some() {
-                                println!("You died.");
-                                exit.send(bevy::app::AppExit);
-                            } else {
-                                commands.entity(*entity).despawn();
+                    let other_handle = if unit_handle == handle1 { handle2 } else { handle1 };
+                    if colliders.contains(other_handle) {
+                        let otype = colliders.get(if unit_handle == handle1 { handle2 } else { handle1 }).unwrap().user_data;
+                        let (unit, entity, player) = units.get_mut(&unit_handle).unwrap().borrow_mut();
+                        if otype == terrain {
+                            unit.is_touching_ground = true;
+                        } else if otype == crate::ObjectType::Bullet as u128 {
+                            unit.hp -= 1;
+                            if unit.hp <= 0 {
+                                if player.is_some() {
+                                    println!("You died.");
+                                    exit.send(bevy::app::AppExit);
+                                } else {
+                                    commands.entity(*entity).despawn();
+                                }
                             }
                         }
                     }
@@ -144,7 +147,8 @@ fn unit_handler(
             geometry::ContactEvent::Stopped(handle1, handle2) => {
                 if units.contains_key(&handle1) || units.contains_key(&handle2) {
                     let unit_handle = if units.contains_key(&handle1) { handle1 } else { handle2 };
-                    if colliders.get(if unit_handle == handle1 { handle2 } else { handle1 }).unwrap().user_data == terrain {
+                    let other_handle = if unit_handle == handle1 { handle2 } else { handle1 };
+                    if colliders.contains(other_handle) && colliders.get(other_handle).unwrap().user_data == terrain {
                         let (unit, ..) = units.get_mut(&unit_handle).unwrap().borrow_mut();
                         unit.is_touching_ground = false;
                     }
