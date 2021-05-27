@@ -73,7 +73,7 @@ fn player_controller(
 }
 
 fn spawn_player(mut commands: Commands) {
-    commands.spawn().insert_bundle(unit::UnitBundle::new(Vec3::new(0.0, 3.0, 0.0), crate::battle::TeamId::NONE)).insert(Player::default());
+    commands.spawn().insert_bundle(unit::UnitBundle::new(Vec3::new(40.0, 3.0, -50.0), crate::battle::TeamId::ONE)).insert(Player::default());
 }
 
 pub struct PlayerPlugin;
