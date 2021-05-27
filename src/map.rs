@@ -43,17 +43,16 @@ fn initialize_map(
     // Load map
     let choice = 2;
     let maps: [&str; 3] = ["monke", "testmap", "map"];
-    let texture = StandardMaterial {
-        metallic: 0.0,
-        reflectance: 0.0,
-        roughness: 1.0,
-        base_color_texture: Some(assets.get_handle(format!("{}.png", maps[choice]).as_str())),
-        ..Default::default()
-    };
 
     commands.spawn().insert_bundle(PbrBundle {
         mesh: assets.get_handle(format!("models/maps/{}.glb#Mesh0/Primitive0", maps[choice]).as_str()),
-        material: materials.add(texture),
+        material: materials.add(StandardMaterial {
+            metallic: 0.0,
+            reflectance: 0.0,
+            roughness: 1.0,
+            base_color_texture: Some(assets.get_handle(format!("{}.png", maps[choice]).as_str())),
+            ..Default::default()
+        }),
         transform: Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
         ..Default::default()
     })
