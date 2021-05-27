@@ -59,7 +59,7 @@ impl BulletBundle {
                 .position(na::Isometry::from_parts(na::Translation3::from(na::Vector3::from(position)), rotation.into()))
                 .linvel(velocity.x, velocity.y, velocity.z)
                 .gravity_scale(0.0),
-            collider: geometry::ColliderBuilder::ball(0.5).user_data(crate::ObjectType::Bullet as u128),
+            collider: geometry::ColliderBuilder::ball(0.2).user_data(crate::ObjectType::Bullet as u128),
         }
     }
 }
