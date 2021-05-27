@@ -76,7 +76,7 @@ fn unit_handler(
     colliders: Res<geometry::ColliderSet>,
 
     assets: Res<AssetServer>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 
     mut exit: ResMut<Events<bevy::app::AppExit>>,
 
@@ -102,9 +102,13 @@ fn unit_handler(
             let pos = Vec3::new(tra.x, tra.y, tra.z) + dir * Vec3::new(2.0, 2.0, 2.0);
             let speed = 300.0;
 
-            commands.spawn().insert_bundle(PbrBundle {
-                mesh: assets.get_handle(format!("models/maps/monke.glb#Mesh0/Primitive0").as_str()),
-                material: materials.add(Color::rgb(0.6, 0.9, 0.6).into()),
+            commands.spawn().insert_bundle(SpriteBundle {
+                sprite: bevy::sprite::Sprite {
+                    size: Vec2::new(5.0, 5.0),
+                    resize_mode: bevy::sprite::SpriteResizeMode::Manual,
+                    ..Default::default()
+                },
+                material: materials.add(assets.load("bullet.png").into()),
                 ..Default::default()
             })
             .insert_bundle(crate::bullet::BulletBundle::new(pos, unit.get_look_quat(), dir * Vec3::new(speed, speed, speed)));

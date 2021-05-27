@@ -12,7 +12,7 @@ impl Default for Bullet {
     fn default() -> Self {
         Self {
             age: 0.0,
-            lifetime: 2.0,
+            lifetime: 1.0,
         }
     }
 }
@@ -29,15 +29,14 @@ fn bullet_handler(
         bullet.age += time.delta_seconds();
         if bullet.age > bullet.lifetime {
             commands.entity(entity).despawn();
-            return
-        }
-
-        let collision = nphase.contacts_with(handle.handle());
-        if collision.is_some() {
-            for (_, _, pair) in collision.unwrap() {
-                if pair.has_any_active_contact {
-                    commands.entity(entity).despawn();
-                    return
+        } else {
+            let collision = nphase.contacts_with(handle.handle());
+            if collision.is_some() {
+                for (_, _, pair) in collision.unwrap() {
+                    if pair.has_any_active_contact {
+                        commands.entity(entity).despawn();
+                        break
+                    }
                 }
             }
         }
@@ -59,7 +58,7 @@ impl BulletBundle {
                 .position(na::Isometry::from_parts(na::Translation3::from(na::Vector3::from(position)), rotation.into()))
                 .linvel(velocity.x, velocity.y, velocity.z)
                 .gravity_scale(0.0),
-            collider: geometry::ColliderBuilder::ball(0.2).user_data(crate::ObjectType::Bullet as u128),
+            collider: geometry::ColliderBuilder::ball(0.3).user_data(crate::ObjectType::Bullet as u128),
         }
     }
 }
