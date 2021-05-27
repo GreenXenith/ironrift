@@ -36,7 +36,7 @@ impl Default for UnitState {
             velocity: na::Vector3::new(0.0, 0.0, 0.0),
             shoot: false,
             team: crate::battle::TeamId::NONE,
-            hp: 4,
+            hp: 3,
         }
     }
 }
