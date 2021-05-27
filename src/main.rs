@@ -53,6 +53,7 @@ fn main() {
             title: "Ironrift".to_string(),
             ..Default::default()
         })
+        .insert_resource(ClearColor(Color::rgb(143.0 / 255.0, 36.0 / 255.0, 17.0 / 255.0)))
 
         // Defaults and setup
         .add_plugins(DefaultPlugins)
