@@ -2,6 +2,8 @@
 A sci-fi first/third-person battlefield-style shooter.
 This was made as an experiment in Rust and Bevy.
 
+![screenshot1.png](screenshot1.png)
+
 ## Building
 Requirements: `rust` and nightly `cargo` via `rustup` and optionally `git`.  
 
@@ -25,3 +27,5 @@ Run using the generated executable in `ironrift/target/release` (must be run at 
 * May be able to jump infinitely
   
 I have no idea why these occur. If they do, just run the game again.
+
+![screenshot2.png](screenshot2.png)
